@@ -1,0 +1,18 @@
+name: Human
+
+source: ../data/Human/data.txt
+fingerprint_dict: ../data/Human/fingerprint_dict.pickle
+word_dict: ../data/Human/word_dict.pickle
+
+train:
+  input: ../data/Human/train_input.npy
+  label: ../data/Human/train_label.npy
+
+valid:
+  input: ../data/Human/valid_input.npy
+  label: ../data/Human/valid_label.npy
+  size: 0.2
+
+model:
+  radius: 2
+  ngram: 3
