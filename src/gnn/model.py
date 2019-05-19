@@ -82,7 +82,7 @@ class Model(object):
 
     def train(self, sess: tf.InteractiveSession, train_x: np.ndarray, train_y: np.ndarray,
               valid_x: np.ndarray, valid_y: np.ndarray, epoch=20,
-              batch_size=128, valid_batch_size=50, step=1, verbose=True):
+              batch_size=128, valid_batch_size=50, step=50, verbose=True):
         print(get_now(), 'start training')
         train_idx = sorted(range(len(train_x)), key=lambda x: len(train_x[x]), reverse=True)
         valid_idx = sorted(range(len(valid_x)), key=lambda x: len(valid_x[x]), reverse=True)

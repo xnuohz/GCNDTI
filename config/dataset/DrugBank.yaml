@@ -1,0 +1,18 @@
+name: DrugBank
+
+source: ../data/DrugBank/data.txt
+fingerprint_dict: ../data/DrugBank/fingerprint_dict.pickle
+word_dict: ../data/DrugBank/word_dict.pickle
+
+train:
+  input: ../data/DrugBank/train_input.npy
+  label: ../data/DrugBank/train_label.npy
+
+valid:
+  input: ../data/DrugBank/valid_input.npy
+  label: ../data/DrugBank/valid_label.npy
+  size: 0.2
+
+model:
+  radius: 2
+  ngram: 3

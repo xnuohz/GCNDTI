@@ -60,7 +60,7 @@ def main(data_cnf):
     np.save(data_cnf['valid']['input'], valid_x)
     np.save(data_cnf['valid']['label'], valid_y)
 
-    dump_dictionary(fingerprint_dict, data_cnf['fingerprint'])
+    dump_dictionary(fingerprint_dict, data_cnf['fingerprint_dict'])
     dump_dictionary(word_dict, data_cnf['word_dict'])
 
     print('The preprocess of ' + dataset + ' dataset has finished!')

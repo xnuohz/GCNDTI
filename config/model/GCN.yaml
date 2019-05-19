@@ -1,0 +1,16 @@
+name: GCN
+
+model:
+  dim: 10
+  layer_gnn: 3
+  layer_cnn: 3
+  linear_size: [1024, 512]
+  drop_rate: 0.5
+  filter_size: 5
+  lr: 1e-3
+
+train:
+  batch_size: 64
+  nb_epoch: 100
+
+path: ../models
