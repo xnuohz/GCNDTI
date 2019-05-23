@@ -38,7 +38,7 @@ def main(data_cnf, model_cnf):
 
     model = Model(**model_cnf['model'], model_path=model_path, n_fingerprint=n_fingerprint, n_word=n_word)
 
-    model.train(sess, train_x, train_y, valid_x, valid_y)
+    model.train(sess, train_x, train_y, valid_x, valid_y, **model_cnf['train'])
 
 
 if __name__ == '__main__':

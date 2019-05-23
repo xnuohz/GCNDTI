@@ -14,12 +14,14 @@ def main(data_cnf):
     data_cnf = yaml.load(Path(data_cnf))
     dataset, radius, ngram = data_cnf['name'], data_cnf['model']['radius'], data_cnf['model']['ngram']
 
-    with open(data_cnf['source'], 'r') as f:
-        data_list = f.read().strip().split('\n')
+    with open(data_cnf['source'][0], 'r') as f:
+        data_list_train = f.read().strip().split('\n')
+    with open(data_cnf['source'][1], 'r') as f:
+        data_list_valid = f.read().strip().split('\n')
 
     """Exclude data contains '.' in the SMILES format."""
-    data_list = [d for d in data_list if '.' not in d.strip().split()[0]]
-    num = len(data_list)
+    data_list_train = [d for d in data_list_train if '.' not in d.strip().split()[0]]
+    data_list_valid = [d for d in data_list_valid if '.' not in d.strip().split()[0]]
 
     atom_dict = defaultdict(lambda: len(atom_dict))
     bond_dict = defaultdict(lambda: len(bond_dict))
@@ -27,33 +29,69 @@ def main(data_cnf):
     edge_dict = defaultdict(lambda: len(edge_dict))
     word_dict = defaultdict(lambda: len(word_dict))
 
+    # train data
     smiles, compounds, adjacencies, proteins, interactions = '', [], [], [], []
 
-    for no, data in enumerate(data_list):
-        print('/'.join(map(str, [no + 1, num])))
+    failed = 0
 
-        smile, sequence, interaction = data.strip().split()
-        smiles += smile + '\n'
+    for no, data in enumerate(data_list_train):
+        print('/'.join(map(str, [no + 1, len(data_list_train)])))
 
-        mol = Chem.AddHs(Chem.MolFromSmiles(smile))
-        atoms = create_atoms(mol, atom_dict)
-        i_jbond_dict = create_ijbonddict(mol, bond_dict)
+        try:
+            smile, sequence, interaction = data.strip().split()
+            smiles += smile + '\n'
 
-        fingerprints = extract_fingerprints(atoms, i_jbond_dict, radius, fingerprint_dict, edge_dict)
-        compounds.append(fingerprints)
+            mol = Chem.AddHs(Chem.MolFromSmiles(smile))
+            atoms = create_atoms(mol, atom_dict)
+            i_jbond_dict = create_ijbonddict(mol, bond_dict)
 
-        adjacency = create_adjacency(mol)
-        adjacencies.append(adjacency)
+            fingerprints = extract_fingerprints(atoms, i_jbond_dict, radius, fingerprint_dict, edge_dict)
+            compounds.append(fingerprints)
 
-        words = split_sequence(sequence, ngram, word_dict)
-        proteins.append(words)
+            adjacency = create_adjacency(mol)
+            adjacencies.append(adjacency)
 
-        interactions.append(np.array([float(interaction)]))
+            words = split_sequence(sequence, ngram, word_dict)
+            proteins.append(words)
 
-    data_x = np.asarray(list(zip(compounds, adjacencies, proteins)))
-    data_y = np.asarray(interactions)
+            interactions.append(np.array([float(interaction)]))
+        except Exception:
+            failed += 1
 
-    train_x, valid_x, train_y, valid_y = train_test_split(data_x, data_y, test_size=data_cnf['valid']['size'])
+    print('failed:', failed)
+    train_x = np.asarray(list(zip(compounds, adjacencies, proteins)))
+    train_y = np.asarray(interactions)
+
+    # valid data
+    smiles, compounds, adjacencies, proteins, interactions = '', [], [], [], []
+
+    for no, data in enumerate(data_list_valid):
+        print('/'.join(map(str, [no + 1, len(data_list_valid)])))
+
+        try:
+            smile, sequence, interaction = data.strip().split()
+            smiles += smile + '\n'
+
+            mol = Chem.AddHs(Chem.MolFromSmiles(smile))
+            atoms = create_atoms(mol, atom_dict)
+            i_jbond_dict = create_ijbonddict(mol, bond_dict)
+
+            fingerprints = extract_fingerprints(atoms, i_jbond_dict, radius, fingerprint_dict, edge_dict)
+            compounds.append(fingerprints)
+
+            adjacency = create_adjacency(mol)
+            adjacencies.append(adjacency)
+
+            words = split_sequence(sequence, ngram, word_dict)
+            proteins.append(words)
+
+            interactions.append(np.array([float(interaction)]))
+        except Exception:
+            failed += 1
+
+    print('failed:', failed)
+    valid_x = np.asarray(list(zip(compounds, adjacencies, proteins)))
+    valid_y = np.asarray(interactions)
 
     np.save(data_cnf['train']['input'], train_x)
     np.save(data_cnf['train']['label'], train_y)

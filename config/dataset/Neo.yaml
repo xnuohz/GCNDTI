@@ -1,0 +1,19 @@
+name: Neo
+
+source:
+  - ../data/Neo/data_train.txt
+  - ../data/Neo/data_valid.txt
+fingerprint_dict: ../data/Neo/fingerprint_dict.pickle
+word_dict: ../data/Neo/word_dict.pickle
+
+train:
+  input: ../data/Neo/train_input.npy
+  label: ../data/Neo/train_label.npy
+
+valid:
+  input: ../data/Neo/valid_input.npy
+  label: ../data/Neo/valid_label.npy
+
+model:
+  radius: 2
+  ngram: 3

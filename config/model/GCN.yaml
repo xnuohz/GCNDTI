@@ -10,7 +10,7 @@ model:
   lr: 1e-3
 
 train:
-  batch_size: 64
-  nb_epoch: 100
+  batch_size: 128
+  epoch: 100
 
 path: ../models

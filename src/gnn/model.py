@@ -82,12 +82,12 @@ class Model(object):
 
     def train(self, sess: tf.InteractiveSession, train_x: np.ndarray, train_y: np.ndarray,
               valid_x: np.ndarray, valid_y: np.ndarray, epoch=20,
-              batch_size=128, valid_batch_size=50, step=50, verbose=True):
+              batch_size=128, valid_batch_size=50, step=200, verbose=True):
         print(get_now(), 'start training')
         train_idx = sorted(range(len(train_x)), key=lambda x: len(train_x[x]), reverse=True)
         valid_idx = sorted(range(len(valid_x)), key=lambda x: len(valid_x[x]), reverse=True)
         sess.run(tf.global_variables_initializer())
-        best_aupr, current = 0, 0
+        best_aupr = best_auc = current = 0
         for idx_epoch in range(epoch):
             for i in range(0, len(train_idx), batch_size):
                 batch_idx = train_idx[i:i + batch_size]
@@ -105,12 +105,14 @@ class Model(object):
                     auc, aupr = get_auc(valid_y, valid_res), get_aupr(valid_y, valid_res)
                     if aupr > best_aupr:
                         best_aupr = aupr
+                        best_auc = auc
                         self.saver.save(sess, self.model_path)
                     if verbose:
                         print(get_now(), current, current * batch_size, idx_epoch, i + batch_size,
                               'train loss:', round(train_loss, 5),
                               'valid loss:', round(valid_loss, 5),
                               'AUC:', round(auc, 5), 'AUPR:', round(aupr, 5))
+        print(get_now(), 'Summary ', 'Best AUC:', best_auc, 'Best AUPR:', best_aupr)
 
     def predict(self, sess: tf.InteractiveSession, data_x: np.ndarray, batch_size=128):
         print(get_now(), 'start predicting')
